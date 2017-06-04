@@ -1,4 +1,4 @@
-package cz.klimesova.public_library;
+package cz.klimesova.public_library.data;
 
 /**
  * Created by Zdenca on 5/29/2017.

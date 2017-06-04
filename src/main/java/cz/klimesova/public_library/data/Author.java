@@ -1,4 +1,4 @@
-package cz.klimesova.public_library;
+package cz.klimesova.public_library.data;
 
 /**
  * Created by Zdenca on 5/29/2017.
@@ -7,7 +7,7 @@ public class Author {
     private int id;
     private Name name;
 
-    public Author(Name name, int id) {
+    public Author( int id, Name name) {
         this.id = id;
         this.name = name;
 

@@ -1,4 +1,4 @@
-package cz.klimesova.public_library;
+package cz.klimesova.public_library.data;
 
 import java.util.List;
 
