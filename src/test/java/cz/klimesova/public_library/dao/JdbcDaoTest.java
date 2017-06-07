@@ -4,7 +4,6 @@ import cz.klimesova.public_library.data.Author;
 import cz.klimesova.public_library.data.Book;
 import cz.klimesova.public_library.data.Name;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -122,9 +121,9 @@ public class JdbcDaoTest {
         Statement statement = connection.createStatement();
         ResultSet rs = statement.executeQuery("select * from books where id = " + book.getId());
         rs.next();
-        assertEquals("Quo", rs.getString(2));
-        assertEquals("000", rs.getString(3));
-        assertEquals(2104, rs.getInt(4));
+        assertEquals(book.getTitle(), rs.getString(2));
+        assertEquals(book.getIsbn(), rs.getString(3));
+        assertEquals(book.getIssueYear(), rs.getInt(4));
         ResultSet rs2 = statement.executeQuery("select author_id from books_to_authors where book_id = " + book.getId());
         rs2.next();
         assertEquals(book.getAuthors().get(0).getId(), rs2.getInt(1));
@@ -144,9 +143,8 @@ public class JdbcDaoTest {
             books.add(book);
             dao.saveBook(book);
         }
-
+        Collections.sort(books, Comparator.comparing(Book::getTitle));
         List<Book> loadedBooks = dao.loadAllBooks();
-        Collections.sort(loadedBooks, Comparator.comparingInt(Book::getId));
         assertEquals(books.size(), loadedBooks.size());
         for (int i = 0; i < books.size(); i++) {
             Book book = books.get(i);
@@ -156,16 +154,10 @@ public class JdbcDaoTest {
             assertEquals(book.getIsbn(), loadedBook.getIsbn());
             assertEquals(book.getIssueYear(), loadedBook.getIssueYear());
             List<Author> loadedBookAuthors = loadedBook.getAuthors();
-            Collections.sort(loadedBookAuthors, Comparator.comparingInt(Author::getId));
             List<Author> bookAuthors = book.getAuthors();
-            assertEquals(bookAuthors.size(), loadedBookAuthors.size());
-            for (int j = 0; j < bookAuthors.size(); j++) {
-                Author author = bookAuthors.get(j);
-                Author loadedAuthor = loadedBookAuthors.get(j);
-                assertEquals(author.getId(), loadedAuthor.getId());
-                assertEquals(author.getName().getFirstName(), loadedAuthor.getName().getFirstName());
-                assertEquals(author.getName().getLastName(), loadedAuthor.getName().getLastName());
-            }
+            Collections.sort(bookAuthors, Comparator.comparing((a) -> (a.getName().getLastName())));
+            assertAuthors(bookAuthors, loadedBookAuthors);
+
         }
     }
 
@@ -210,7 +202,34 @@ public class JdbcDaoTest {
         rs.next();
         assertEquals(author.getName().getFirstName(), rs.getString(2));
         assertEquals(author.getName().getLastName(), rs.getString(3));
+    }
+
+    @Test
+    public void loadAllAuthors() throws Exception {
+        JdbcDao dao = new JdbcDao(connectionProperties);
+        List<Author> authors = new ArrayList<>();
+        for (int i = 1; i <= 100; i++) {
+            Author author = new Author(0, new Name("first_name_" + i, "last_name_" + i));
+            authors.add(author);
+            dao.saveAuthor(author);
+        }
+        Collections.sort(authors, Comparator.comparing(a -> a.getName().getLastName()));
+        List<Author> loadedAuthors = dao.loadAllAuthors();
+        assertAuthors(authors, loadedAuthors);
+    }
+
+    public void assertAuthors(List<Author> authors, List<Author> loadedAuthors) {
+        assertEquals(authors.size(), loadedAuthors.size());
+        for (int j = 0; j < authors.size(); j++) {
+            Author author = authors.get(j);
+            Author loadedAuthor = loadedAuthors.get(j);
+            assertEquals(author.getId(), loadedAuthor.getId());
+            assertEquals(author.getName().getFirstName(), loadedAuthor.getName().getFirstName());
+            assertEquals(author.getName().getLastName(), loadedAuthor.getName().getLastName());
+        }
 
     }
-}
 
+
+
+}

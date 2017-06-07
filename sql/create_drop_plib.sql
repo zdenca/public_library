@@ -15,7 +15,7 @@ constraint pk_book_id primary key (id));
 create table authors
 (id number not null,
 first_name varchar(100),
-last_name varchar(256),
+last_name varchar(256) not null,
 constraint pk_author_id primary key (id));
 
 create table books_to_authors

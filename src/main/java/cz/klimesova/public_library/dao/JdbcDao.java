@@ -3,6 +3,8 @@ package cz.klimesova.public_library.dao;
 import cz.klimesova.public_library.data.Author;
 import cz.klimesova.public_library.data.Book;
 import cz.klimesova.public_library.data.Name;
+import org.apache.tomcat.jdbc.pool.DataSource;
+import org.apache.tomcat.jdbc.pool.PoolProperties;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -148,7 +150,7 @@ public class JdbcDao {
 
     private List<Author> loadAuthorsOfBook(int bookId, Connection connection) {
         String loadSQL = "select a.* from books_to_authors ba" +
-                " join authors a on a.id = ba.author_id where book_id = " + bookId;
+                " join authors a on a.id = ba.author_id where book_id = " + bookId + "order by last_name";
         List<Author> authors = new ArrayList<>();
         try {
             Statement statement = connection.createStatement();
@@ -168,7 +170,7 @@ public class JdbcDao {
 
 
     public List<Book> loadAllBooks() {
-        String loadSQL = "select * from books";
+        String loadSQL = "select * from books order by title";
         List<Book> books = new ArrayList<>();
         try (Connection connection = getConnection();
              Statement statement = connection.createStatement();
@@ -256,7 +258,6 @@ public class JdbcDao {
         String updateSQL = "update authors set first_name = ?, last_name = ? where id = ?";
         try (Connection connection = getConnection()) {
             try (PreparedStatement update = connection.prepareStatement(updateSQL)) {
-
                 update.setString(1, author.getName().getFirstName());
                 update.setString(2, author.getName().getLastName());
                 update.setInt(3, author.getId());
@@ -272,7 +273,7 @@ public class JdbcDao {
     }
 
     public List<Author> loadAllAuthors() {
-        String loadSQL = "select * from authors";
+        String loadSQL = "select * from authors order by last_name";
         List<Author> authors = new ArrayList<>();
         try (Connection connection = getConnection()) {
             Statement load = connection.createStatement();
