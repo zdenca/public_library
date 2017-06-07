@@ -1,5 +1,6 @@
 package cz.klimesova.public_library.data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -7,7 +8,7 @@ import java.util.List;
  */
 public class Book {
     private int id;
-    private List<Author> authors;
+    private final List<Author> authors = new ArrayList<>();
     private String title;
     private String isbn;
     private int issueYear;
@@ -16,7 +17,7 @@ public class Book {
     public Book(int id, String title, List<Author> authors, String isbn, int issueYear) {
         this.id = id;
         this.title = title;
-        this.authors = authors;
+        this.authors.addAll(authors);
         this.isbn = isbn;
         this.issueYear = issueYear;
     }
@@ -30,11 +31,12 @@ public class Book {
     }
 
     public List<Author> getAuthors() {
-        return authors;
+        return new ArrayList<>(authors);
     }
 
     public void setAuthors(List<Author> authors) {
-        this.authors = authors;
+        this.authors.clear();
+        this.authors.addAll(authors);
     }
 
     public String getTitle() {

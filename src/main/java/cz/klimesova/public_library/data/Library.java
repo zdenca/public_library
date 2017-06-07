@@ -1,31 +1,36 @@
 package cz.klimesova.public_library.data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Zdenca on 5/30/2017.
  */
 public class Library {
-    private List<Book> books;
-    private List<Author> authors;
+    private final List<Book> books = new ArrayList<>();
+    private final List<Author> authors = new ArrayList<>();
 
     public Library(List<Book> books, List<Author> authors) {
-        this.authors = authors;
-        this.books = books;
-    }
-    public List<Author> getAuthors() {
-        return authors;
-    }
-    public void setAuthors(List<Author> authors) {
-        this.authors = authors;
+        this.authors.addAll(authors);
+        this.books.addAll(books);
     }
 
-    public List<Book> getBooks() {
-        return books;
+    public List<Author> getAuthors() {
+        return new ArrayList<>(authors);
     }
 
     public void setBooks(List<Book> books) {
-        this.books = books;
+        this.books.clear();
+        this.books.addAll(books);
+    }
+
+    public List<Book> getBooks() {
+        return new ArrayList<>(books);
+    }
+
+    public void setAuthors(List<Author> authors) {
+        this.authors.clear();
+        this.authors.addAll(authors);
     }
 
     @Override
