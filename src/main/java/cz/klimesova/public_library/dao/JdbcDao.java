@@ -16,16 +16,26 @@ import java.util.Map;
  * Created by Zdenca on 5/30/2017.
  */
 public class JdbcDao {
-    private final ConnectionProperties connectionProperties;
+    private final DataSource dataSource;
 
     public JdbcDao(ConnectionProperties connectionProperties) {
-        this.connectionProperties = connectionProperties;
+        PoolProperties p = new PoolProperties();
+        p.setUrl(connectionProperties.getConnection());
+        p.setUsername(connectionProperties.getUser());
+        p.setPassword(connectionProperties.getPassword());
+        p.setDriverClassName("oracle.jdbc.driver.OracleDriver");
+        p.setMaxIdle(5);
+        p.setMinIdle(0);
+        p.setMaxActive(5);
+        p.setInitialSize(1);
+
+        dataSource = new DataSource();
+        dataSource.setPoolProperties(p);
     }
 
     private Connection getConnection() {
         try {
-            return DriverManager.getConnection(connectionProperties.getConnection(), connectionProperties.getUser(),
-                    connectionProperties.getPassword());
+            return dataSource.getConnection();
         } catch (SQLException e) {
             throw new RuntimeException("Cannot create database connection", e);
         }
