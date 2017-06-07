@@ -227,9 +227,5 @@ public class JdbcDaoTest {
             assertEquals(author.getName().getFirstName(), loadedAuthor.getName().getFirstName());
             assertEquals(author.getName().getLastName(), loadedAuthor.getName().getLastName());
         }
-
     }
-
-
-
 }
