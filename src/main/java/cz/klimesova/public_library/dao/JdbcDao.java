@@ -7,10 +7,7 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Zdenca on 5/30/2017.
@@ -300,5 +297,30 @@ public class JdbcDao {
         return authors;
     }
 
+    public boolean existsBook(int bookId) {
+        return existsRecord(bookId, "books");
+    }
 
+    public boolean existsAuthor(int authorId) {
+        return existsRecord(authorId, "authors");
+    }
+
+    private boolean existsRecord(int id, String tableName) {
+        String selectSQL = "select count(*) from " + tableName + " where id = " + id;
+        try (Connection connection = getConnection()) {
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(selectSQL);
+            rs.next();
+            int count = rs.getInt(1);
+            if (count == 1) {
+                return true;
+            } else if (count == 0) {
+                return false;
+            } else {
+                throw new RuntimeException("Invalid count of records found: " + count);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Checking of existence of records failed", e);
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package cz.klimesova.public_library.dao;
 
+import cz.klimesova.public_library.AbstractLibraryTest;
 import cz.klimesova.public_library.data.Author;
 import cz.klimesova.public_library.data.Book;
 import cz.klimesova.public_library.data.Name;
@@ -18,38 +19,7 @@ import static org.junit.Assert.*;
 /**
  * Created by Zdenca on 5/30/2017.
  */
-public class JdbcDaoTest {
-    private static final String DB_CONNECTION = "jdbc:oracle:thin:@localhost:1521:orcl";
-    private static final String DB_USER = "plib_test";
-    private static final String DB_PASSWORD = "plib_test";
-
-    private ConnectionProperties connectionProperties = new ConnectionProperties(DB_CONNECTION, DB_USER, DB_PASSWORD);
-    private Connection connection;
-
-    private Connection getConnection() {
-        try {
-            return DriverManager.getConnection(DB_CONNECTION, DB_USER,
-                    DB_PASSWORD);
-        } catch (SQLException e) {
-            throw new RuntimeException("Cannot create database connection", e);
-        }
-    }
-
-
-    @Before
-    public void setUp() {
-        connection = getConnection();
-    }
-
-    @After
-    public void tearDown() throws SQLException {
-        Statement delete = connection.createStatement();
-        delete.execute("delete from books_to_authors");
-        delete.execute("delete from authors");
-        delete.execute("delete from books");
-        connection.commit();
-        connection.close();
-    }
+public class JdbcDaoTest extends AbstractLibraryTest {
 
     @Test
     public void saveBook() throws Exception {
@@ -157,7 +127,6 @@ public class JdbcDaoTest {
             List<Author> bookAuthors = book.getAuthors();
             Collections.sort(bookAuthors, Comparator.comparing((a) -> (a.getName().getLastName())));
             assertAuthors(bookAuthors, loadedBookAuthors);
-
         }
     }
 
@@ -228,4 +197,32 @@ public class JdbcDaoTest {
             assertEquals(author.getName().getLastName(), loadedAuthor.getName().getLastName());
         }
     }
+
+    @Test
+    public void existsAuthor() {
+        JdbcDao dao = new JdbcDao(connectionProperties);
+        Author author = createAuthor(0, "first", "last");
+        dao.saveAuthor(author);
+        assertNotEquals(0, author.getId());
+        boolean exists = dao.existsAuthor(author.getId());
+        assertTrue(exists);
+
+        exists = dao.existsAuthor(-20);
+        assertFalse(exists);
+    }
+
+    @Test
+    public void existsBook() {
+        JdbcDao dao = new JdbcDao(connectionProperties);
+        Book book = createBook(0, "Testing", createListOfAuthors(createAuthor(0, "first", "last")), "isbn-0", 1234);
+        dao.saveBook(book);
+        assertNotEquals(0, book.getId());
+        boolean exists = dao.existsBook(book.getId());
+        assertTrue(exists);
+
+        exists = dao.existsBook(-20);
+        assertFalse(exists);
+    }
+
+
 }
